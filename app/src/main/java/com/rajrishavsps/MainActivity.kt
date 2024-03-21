@@ -15,6 +15,7 @@ import com.rajrishavsps.screen.LoadingScreen
 import com.rajrishavsps.screen.LocationPermissionScreen
 import com.rajrishavsps.screen.MapScreen
 import com.rajrishavsps.screen.SlotsList
+import com.rajrishavsps.screen.SlotsScreen
 import com.rajrishavsps.ui.theme.SPSTheme
 import com.rajrishavsps.utils.checkForPermission
 
@@ -42,8 +43,7 @@ class MainActivity : ComponentActivity() {
 //                            hasLocationPermission = true
 //                        }
 //                    }
-
-                    SlotsList()
+                    SlotsScreen()
                 }
             }
         }

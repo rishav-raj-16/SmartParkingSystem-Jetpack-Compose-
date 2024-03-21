@@ -16,21 +16,86 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rajrishavsps.ui.theme.LightBlue
 
-@Preview(showSystemUi = true)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun SlotsScreen() {
+
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = White
+                ),
+                title = {
+                    Text(
+                        text = "Smart Parking System"
+                    )
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { paddingValue ->
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier
+                .padding(paddingValue)
+                .padding(top = 2.dp)
+        ) {
+            Column {
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Parking Slots",
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontFamily = FontFamily.Serif,
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(top = 5.dp, bottom = 10.dp)
+                    )
+                }
+
+                Text(
+                    text = "Choose the Parking Slot..",
+                    modifier = Modifier.padding(bottom = 20.dp, start = 5.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                SlotsList()
+            }
+        }
+    }
+}
+
+
 @Composable
 fun SlotsList() {
 
@@ -39,7 +104,6 @@ fun SlotsList() {
     Column(
         modifier = Modifier.verticalScroll(scrollState)
     ) {
-
         for (i in 1..20 step 2) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -51,7 +115,7 @@ fun SlotsList() {
                 VerticalDivider(
                     modifier = Modifier.height(100.dp),
                     thickness = 2.dp,
-                    color = Color.Blue
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.padding(5.dp))
                 SingleSlot(modifier = Modifier.weight(1f), slotNumber = i + 1)
@@ -61,14 +125,13 @@ fun SlotsList() {
     }
 }
 
-
-
 @Composable
 fun SingleSlot(modifier: Modifier = Modifier, slotNumber: Int = 0) {
     Box(
         modifier = modifier
+            .padding(start = 5.dp, end = 5.dp)
             .height(150.dp)
-            .border(2.dp, LightBlue, RoundedCornerShape(2.dp))
+            .border(2.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(2.dp))
             .padding(8.dp)
     ) {
         Column(
@@ -81,7 +144,11 @@ fun SingleSlot(modifier: Modifier = Modifier, slotNumber: Int = 0) {
                 text = "A-$slotNumber",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
-                    .border(width = 1.dp, color = LightBlue, RoundedCornerShape(10.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        RoundedCornerShape(10.dp)
+                    )
                     .padding(start = 10.dp, end = 10.dp)
             )
 
@@ -89,7 +156,7 @@ fun SingleSlot(modifier: Modifier = Modifier, slotNumber: Int = 0) {
                 modifier = Modifier
                     .height(30.dp),
                 onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Blue),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(start = 30.dp, end = 30.dp),
             ) {
