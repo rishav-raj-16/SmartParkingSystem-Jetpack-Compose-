@@ -1,6 +1,7 @@
 package com.rajrishavsps.screen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -25,6 +28,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.rajrishavsps.presentation.MapEvent
 import com.rajrishavsps.presentation.MapsViewModel
+import com.rajrishavsps.presentation.NavScreen
 
 
 @Composable
@@ -33,7 +37,9 @@ fun MapScreen(
     context: Context,
     latlang: LatLng,
     mapProperties: MapProperties,
-    uiSettings: MapUiSettings
+    uiSettings: MapUiSettings,
+    navController: NavController,
+    onMarkerClicked: (Marker) -> Boolean
 ) {
 
     val latlangList = remember {
@@ -69,14 +75,13 @@ fun MapScreen(
                 uiSettings = uiSettings,
                 cameraPositionState = cameraPositionState,
                 modifier = Modifier.fillMaxSize(),
-                onMapClick = {
-                             latlangList.add(it)
-                },
+
             ){
                 latlangList.forEach{
                     Marker(
                         state = MarkerState(position = it),
                         title = "Location",
+                        onClick = onMarkerClicked
                     )
                 }
             }

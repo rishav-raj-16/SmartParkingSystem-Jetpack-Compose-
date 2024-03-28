@@ -56,3 +56,5 @@ fun getCurrentLocation(context: Context, onLocationFetched: (location: LatLng) -
 
 }
 
+
+

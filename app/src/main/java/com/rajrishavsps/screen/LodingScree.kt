@@ -10,14 +10,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MarkerState
 import com.rajrishavsps.presentation.MapState
+import com.rajrishavsps.presentation.NavScreen
 import com.rajrishavsps.utils.getCurrentLocation
 
 
 @Composable
-fun LoadingScreen(context: Context) {
+fun LoadingScreen(context: Context, navController: NavController) {
     var showMap by remember {
         mutableStateOf(false)
     }
@@ -35,19 +39,26 @@ fun LoadingScreen(context: Context) {
         MapUiSettings(zoomControlsEnabled = false);
     }
 
+    val onMarkerClicked: (Marker) -> Boolean = { marker ->
+        navController.navigate(NavScreen.SlotsScreen.rout)
+        true // or false depending on your logic
+    }
+
     if (showMap) {
         MapScreen(
             context = context,
             latlang = location,
             mapProperties = mapProperties,
-            uiSettings = uiSettings
+            uiSettings = uiSettings,
+            navController = navController,
+            onMarkerClicked = onMarkerClicked
         )
     } else {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Loading Map....")
+            Text(text = "Loading Maps....")
         }
     }
 
