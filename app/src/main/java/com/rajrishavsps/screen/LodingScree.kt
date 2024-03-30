@@ -39,11 +39,6 @@ fun LoadingScreen(context: Context, navController: NavController) {
         MapUiSettings(zoomControlsEnabled = false);
     }
 
-    val onMarkerClicked: (Marker) -> Boolean = { marker ->
-        navController.navigate(NavScreen.SlotsScreen.rout)
-        true // or false depending on your logic
-    }
-
     if (showMap) {
         MapScreen(
             context = context,
@@ -51,7 +46,6 @@ fun LoadingScreen(context: Context, navController: NavController) {
             mapProperties = mapProperties,
             uiSettings = uiSettings,
             navController = navController,
-            onMarkerClicked = onMarkerClicked
         )
     } else {
         Column(

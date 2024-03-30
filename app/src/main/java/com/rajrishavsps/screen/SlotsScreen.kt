@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -32,15 +36,15 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.rajrishavsps.presentation.NavScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun SlotsScreen() {
+fun SlotsScreen(navController: NavController) {
 
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -55,12 +59,24 @@ fun SlotsScreen() {
                 ),
                 title = {
                     Text(
-                        text = "Smart Parking System"
+                        text = "Parking Slots"
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
     ) { paddingValue ->
         Surface(
             color = MaterialTheme.colorScheme.background,
@@ -89,7 +105,7 @@ fun SlotsScreen() {
                     modifier = Modifier.padding(bottom = 20.dp, start = 5.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )
-                SlotsList()
+                SlotsList(navController)
             }
         }
     }
@@ -97,7 +113,7 @@ fun SlotsScreen() {
 
 
 @Composable
-fun SlotsList() {
+fun SlotsList(navController: NavController) {
 
     val scrollState = rememberScrollState()
 
@@ -110,7 +126,11 @@ fun SlotsList() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SingleSlot(modifier = Modifier.weight(1f), slotNumber = i)
+                SingleSlot(
+                    modifier = Modifier.weight(1f),
+                    slotNumber = i,
+                    navController = navController,
+                )
                 Spacer(modifier = Modifier.padding(5.dp))
                 VerticalDivider(
                     modifier = Modifier.height(100.dp),
@@ -118,7 +138,11 @@ fun SlotsList() {
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.padding(5.dp))
-                SingleSlot(modifier = Modifier.weight(1f), slotNumber = i + 1)
+                SingleSlot(
+                    modifier = Modifier.weight(1f),
+                    slotNumber = i + 1,
+                    navController = navController,
+                )
             }
             Spacer(modifier = Modifier.height(10.dp))
         }
@@ -126,7 +150,11 @@ fun SlotsList() {
 }
 
 @Composable
-fun SingleSlot(modifier: Modifier = Modifier, slotNumber: Int = 0) {
+fun SingleSlot(
+    modifier: Modifier = Modifier,
+    slotNumber: Int = 0,
+    navController: NavController,
+) {
     Box(
         modifier = modifier
             .padding(start = 5.dp, end = 5.dp)
@@ -152,16 +180,20 @@ fun SingleSlot(modifier: Modifier = Modifier, slotNumber: Int = 0) {
                     .padding(start = 10.dp, end = 10.dp)
             )
 
+
             Button(
                 modifier = Modifier
                     .height(30.dp),
-                onClick = { /*TODO*/ },
+                onClick = {
+                        navController.navigate(NavScreen.BookingScreen.rout + "/A-${slotNumber}")
+                },
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(start = 30.dp, end = 30.dp),
             ) {
+
                 Text(
-                    text = "BOOK",
+                    text = "Book",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
