@@ -194,7 +194,7 @@ fun SingleSlot(
                     .height(30.dp),
                 onClick = {
                     if (!isBooked) {
-                        navController.navigate(NavScreen.BookingScreen.rout + "/A-${slotNumber}")
+                        navController.navigate(NavScreen.BookingScreen.rout + "/$slotNumber")
                         viewModel.bookedList.add(slotNumber)
                     }
                 },

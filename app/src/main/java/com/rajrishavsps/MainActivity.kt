@@ -62,13 +62,14 @@ class MainActivity : ComponentActivity() {
 
                         composable(NavScreen.BookingScreen.rout + "/{slot}", arguments = listOf(
                             navArgument("slot") {
-                                type = NavType.StringType
+                                type = NavType.IntType
                             }
                         )) { backStackEntry ->
 
+                            val slot = backStackEntry.arguments?.getInt("slot") ?: 0
                             BookingScreen(
                                 navController = navController,
-                                backStackEntry = backStackEntry
+                                slot = slot
                             )
                         }
 

@@ -55,7 +55,7 @@ import com.rajrishavsps.R
 @Composable
 fun BookingScreen(
     navController: NavController,
-    backStackEntry: NavBackStackEntry,
+    slot:Int
 ) {
 
     var sliderPosition by remember {
@@ -66,7 +66,7 @@ fun BookingScreen(
         mutableStateOf(false)
     }
 
-    val slot = backStackEntry.arguments?.getString("slot")
+
 
     if (!showDialog) {
         Scaffold(
@@ -195,7 +195,7 @@ fun BookingScreen(
 
                     Spacer(modifier = Modifier.padding(top = 10.dp))
 
-                    YourSlot(slot = slot.toString())
+                    YourSlot(slot = "A-$slot")
 
                     Spacer(modifier = Modifier.padding(top = 10.dp))
                 }
