@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.MapStyleOptions
 class MapsViewModel : ViewModel() {
     var state by mutableStateOf(MapState())
 
+    var bookedList = mutableSetOf<Int>()
     fun onEvent(event: MapEvent) {
         when(event){
             is MapEvent.ToggleFalloutMap -> {

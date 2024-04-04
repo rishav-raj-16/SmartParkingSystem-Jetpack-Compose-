@@ -32,6 +32,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontFamily
@@ -39,12 +40,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.rajrishavsps.presentation.MapsViewModel
 import com.rajrishavsps.presentation.NavScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SlotsScreen(navController: NavController) {
+fun SlotsScreen(navController: NavController, viewModel: MapsViewModel) {
 
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -105,7 +107,7 @@ fun SlotsScreen(navController: NavController) {
                     modifier = Modifier.padding(bottom = 20.dp, start = 5.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )
-                SlotsList(navController)
+                SlotsList(navController, viewModel)
             }
         }
     }
@@ -113,7 +115,7 @@ fun SlotsScreen(navController: NavController) {
 
 
 @Composable
-fun SlotsList(navController: NavController) {
+fun SlotsList(navController: NavController, viewModel: MapsViewModel) {
 
     val scrollState = rememberScrollState()
 
@@ -130,6 +132,7 @@ fun SlotsList(navController: NavController) {
                     modifier = Modifier.weight(1f),
                     slotNumber = i,
                     navController = navController,
+                    viewModel = viewModel
                 )
                 Spacer(modifier = Modifier.padding(5.dp))
                 VerticalDivider(
@@ -142,6 +145,7 @@ fun SlotsList(navController: NavController) {
                     modifier = Modifier.weight(1f),
                     slotNumber = i + 1,
                     navController = navController,
+                    viewModel = viewModel
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -154,7 +158,11 @@ fun SingleSlot(
     modifier: Modifier = Modifier,
     slotNumber: Int = 0,
     navController: NavController,
+    viewModel: MapsViewModel
 ) {
+
+    val isBooked = slotNumber in viewModel.bookedList
+
     Box(
         modifier = modifier
             .padding(start = 5.dp, end = 5.dp)
@@ -185,15 +193,18 @@ fun SingleSlot(
                 modifier = Modifier
                     .height(30.dp),
                 onClick = {
+                    if (!isBooked) {
                         navController.navigate(NavScreen.BookingScreen.rout + "/A-${slotNumber}")
+                        viewModel.bookedList.add(slotNumber)
+                    }
                 },
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                colors = ButtonDefaults.buttonColors(if (isBooked) Red else MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(start = 30.dp, end = 30.dp),
             ) {
 
                 Text(
-                    text = "Book",
+                    text = if (isBooked) "Booked" else "Book",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )

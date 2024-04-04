@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.rajrishavsps.presentation.MapsViewModel
 import com.rajrishavsps.presentation.NavScreen
 import com.rajrishavsps.screen.BookingScreen
 import com.rajrishavsps.screen.LoadingScreen
@@ -25,6 +26,9 @@ import com.rajrishavsps.ui.theme.SPSTheme
 import com.rajrishavsps.utils.checkForPermission
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel = MapsViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +57,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(NavScreen.SlotsScreen.rout) {
-                            SlotsScreen(navController = navController,)
+                            SlotsScreen(navController = navController,viewModel = viewModel)
                         }
 
                         composable(NavScreen.BookingScreen.rout + "/{slot}", arguments = listOf(
