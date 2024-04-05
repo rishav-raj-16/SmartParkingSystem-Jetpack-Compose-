@@ -1,5 +1,7 @@
 package com.rajrishavsps.screen
 
+import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
@@ -43,8 +46,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -80,23 +87,28 @@ fun BookingScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+    val focusRequester = remember {
+        FocusRequester()
+    }
+    val view = LocalView.current
 
     if (!showDialog) {
         Scaffold(
             topBar = {
-            CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary
-            ), title = { Text(text = "BOOK SLOT") }, navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            })
-        },
+                CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ), title = { Text(text = "BOOK SLOT") }, navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                })
+            },
 
             bottomBar = {
                 BottomAppBar(
@@ -127,15 +139,15 @@ fun BookingScreen(
                                         snackbarHostState.showSnackbar("Please enter your name")
                                     }
                                 } else {
-                                    viewModel.bookedList.add(slot)
+                                    viewModel.bookSlot(slot, (sliderPosition * 1000).toInt())
                                     showDialog = !showDialog
                                 }
                             },
                             contentPadding = PaddingValues(vertical = 20.dp, horizontal = 60.dp),
                             modifier = Modifier.background(
-                                    shape = RoundedCornerShape(5.dp),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                shape = RoundedCornerShape(5.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         ) {
                             Text(
                                 text = "PAY NOW", fontSize = 20.sp
@@ -144,9 +156,9 @@ fun BookingScreen(
                     }
                 }
             },
+
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-            )
-        { paddingValue ->
+        ) { paddingValue ->
             Surface(
                 modifier = Modifier
                     .padding(paddingValue)
@@ -176,20 +188,35 @@ fun BookingScreen(
                     Spacer(modifier = Modifier.padding(top = 10.dp))
 
 
-                    OutlinedTextField(label = {
-                        Text(
-                            text = "Enter your name", color = MaterialTheme.colorScheme.primary
-                        )
-                    }, value = name, onValueChange = { name = it }, leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }, colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    ), modifier = Modifier.fillMaxWidth()
+                    OutlinedTextField(
+                        label = {
+                            Text(
+                                text = "Enter your name",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        value = name,
+                        onValueChange = { name = it },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }, colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        singleLine = true,
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                focusRequester.requestFocus()
+                                val inputManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+                                inputManager.hideSoftInputFromWindow(view.windowToken, 0)
+                            }
+                        ),
+                        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester = focusRequester)
                     )
 
                     Spacer(modifier = Modifier.padding(top = 10.dp))
@@ -259,8 +286,8 @@ fun YourSlot(slot: String) {
 
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp)
-                )
+                color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp)
+            )
         ) {
             Text(
                 modifier = Modifier.padding(30.dp),

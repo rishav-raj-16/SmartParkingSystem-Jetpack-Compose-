@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.MapStyleOptions
+import kotlinx.coroutines.CoroutineScope
 
 class MapsViewModel : ViewModel() {
     var state by mutableStateOf(MapState())
 
-    var bookedList = mutableSetOf<Int>()
+    var bookedSlots = mutableMapOf<Int,Int>()
+
     fun onEvent(event: MapEvent) {
         when(event){
             is MapEvent.ToggleFalloutMap -> {
@@ -22,5 +24,14 @@ class MapsViewModel : ViewModel() {
             }
         }
     }
+
+    fun bookSlot(slotNumber: Int, duration: Int) {
+        bookedSlots[slotNumber] = duration
+    }
+
+    fun unbookSlot(slotNumber: Int) {
+        bookedSlots.remove(slotNumber)
+    }
+
 }
 

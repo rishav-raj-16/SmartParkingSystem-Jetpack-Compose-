@@ -12,11 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerState
 import com.rajrishavsps.presentation.MapState
-import com.rajrishavsps.presentation.NavScreen
 import com.rajrishavsps.utils.getCurrentLocation
 
 
@@ -41,9 +38,7 @@ fun LoadingScreen(context: Context, navController: NavController) {
 
     if (showMap) {
         MapScreen(
-            context = context,
             latlang = location,
-            mapProperties = mapProperties,
             uiSettings = uiSettings,
             navController = navController,
         )
