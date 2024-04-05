@@ -195,7 +195,6 @@ fun SingleSlot(
                 onClick = {
                     if (!isBooked) {
                         navController.navigate(NavScreen.BookingScreen.rout + "/$slotNumber")
-                        viewModel.bookedList.add(slotNumber)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(if (isBooked) Red else MaterialTheme.colorScheme.primary),

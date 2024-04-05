@@ -28,6 +28,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -37,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,14 +52,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.rajrishavsps.R
+import com.rajrishavsps.presentation.MapsViewModel
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingScreen(
-    navController: NavController,
-    slot:Int
+    navController: NavController, slot: Int, viewModel: MapsViewModel
 ) {
+
+    var name by remember {
+        mutableStateOf("")
+    }
 
     var sliderPosition by remember {
         mutableFloatStateOf(10f)
@@ -66,28 +74,29 @@ fun BookingScreen(
         mutableStateOf(false)
     }
 
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    val coroutineScope = rememberCoroutineScope()
 
 
     if (!showDialog) {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    title = { Text(text = "BOOK SLOT") },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                )
-            },
+            CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.onPrimary
+            ), title = { Text(text = "BOOK SLOT") }, navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            })
+        },
 
             bottomBar = {
                 BottomAppBar(
@@ -101,8 +110,7 @@ fun BookingScreen(
                     ) {
                         Column {
                             Text(
-                                text = "Amount to be Pay",
-                                fontWeight = FontWeight.SemiBold
+                                text = "Amount to be Pay", fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 text = "\u20B9 ${sliderPosition * 10}",
@@ -114,24 +122,31 @@ fun BookingScreen(
 
                         Button(
                             onClick = {
-                                      showDialog = !showDialog
+                                if (name.isBlank()) {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Please enter your name")
+                                    }
+                                } else {
+                                    viewModel.bookedList.add(slot)
+                                    showDialog = !showDialog
+                                }
                             },
                             contentPadding = PaddingValues(vertical = 20.dp, horizontal = 60.dp),
-                            modifier = Modifier
-                                .background(
+                            modifier = Modifier.background(
                                     shape = RoundedCornerShape(5.dp),
                                     color = MaterialTheme.colorScheme.primary
                                 )
                         ) {
                             Text(
-                                text = "PAY NOW",
-                                fontSize = 20.sp
+                                text = "PAY NOW", fontSize = 20.sp
                             )
                         }
                     }
                 }
-            }
-        ) { paddingValue ->
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+            )
+        { paddingValue ->
             Surface(
                 modifier = Modifier
                     .padding(paddingValue)
@@ -160,31 +175,21 @@ fun BookingScreen(
                     Divider(color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.padding(top = 10.dp))
 
-                    var name by remember {
-                        mutableStateOf("")
-                    }
-                    OutlinedTextField(
-                        label = {
-                            Text(
-                                text = "Enter your name",
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        value = name,
-                        onValueChange = { name = it },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.Person,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
+
+                    OutlinedTextField(label = {
+                        Text(
+                            text = "Enter your name", color = MaterialTheme.colorScheme.primary
+                        )
+                    }, value = name, onValueChange = { name = it }, leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }, colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                    ), modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.padding(top = 10.dp))
@@ -244,7 +249,7 @@ fun InputTime(currentPosition: Float, onPositionChange: (Float) -> Unit) {
 
 
 @Composable
-fun YourSlot(slot:String) {
+fun YourSlot(slot: String) {
 
 
     Column {
@@ -253,11 +258,8 @@ fun YourSlot(slot:String) {
         Spacer(modifier = Modifier.padding(10.dp))
 
         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(20.dp)
+            contentAlignment = Alignment.Center, modifier = Modifier.background(
+                    color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(20.dp)
                 )
         ) {
             Text(
@@ -288,25 +290,19 @@ fun DoneDialog(navController: NavController, price: String) {
         },
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.done),
                     contentDescription = "Done Image",
-                    modifier = Modifier
-                        .size(200.dp)
+                    modifier = Modifier.size(200.dp)
                 )
                 Text(
-                    text = "Your Slot Booked",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = "Your Slot Booked", fontSize = 20.sp, fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = price,
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = price, fontSize = 40.sp, fontWeight = FontWeight.SemiBold
                 )
             }
         },
@@ -316,7 +312,7 @@ fun DoneDialog(navController: NavController, price: String) {
                     .fillMaxWidth()
                     .background(color = Color.Red)
             ) {
-                Button(onClick = { navController.popBackStack()}) {
+                Button(onClick = { navController.popBackStack() }) {
                     Text(text = "Done")
                 }
             }

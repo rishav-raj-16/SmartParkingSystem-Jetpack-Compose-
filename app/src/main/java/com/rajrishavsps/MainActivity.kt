@@ -69,7 +69,8 @@ class MainActivity : ComponentActivity() {
                             val slot = backStackEntry.arguments?.getInt("slot") ?: 0
                             BookingScreen(
                                 navController = navController,
-                                slot = slot
+                                slot = slot,
+                                viewModel = viewModel
                             )
                         }
 
