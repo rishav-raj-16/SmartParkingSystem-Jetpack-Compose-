@@ -12,8 +12,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.MapUiSettings
 import com.rajrishavsps.presentation.MapState
+import com.rajrishavsps.presentation.NavScreen
 import com.rajrishavsps.utils.getCurrentLocation
 
 
@@ -22,14 +24,24 @@ fun LoadingScreen(context: Context, navController: NavController) {
     var showMap by remember {
         mutableStateOf(false)
     }
+
+    var showSlots by remember {
+        mutableStateOf(false)
+    }
+
     var location by remember {
         mutableStateOf(LatLng(0.0, 0.0))
     }
-    val mapProperties = MapState().properties
 
     getCurrentLocation(context) {
         location = it
         showMap = true
+    }
+
+    fun onMarkerClicked(): Boolean {
+        showSlots = true
+        showMap = false
+        return true
     }
 
     val uiSettings = remember {
@@ -41,8 +53,11 @@ fun LoadingScreen(context: Context, navController: NavController) {
             latlang = location,
             uiSettings = uiSettings,
             navController = navController,
+            onMarkerClicked = ::onMarkerClicked
         )
-    } else {
+    } else if (showSlots){
+        navController.navigate(NavScreen.SlotsScreen.rout)
+    }else {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

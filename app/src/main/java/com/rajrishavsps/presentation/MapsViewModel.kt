@@ -1,19 +1,24 @@
 package com.rajrishavsps.presentation
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.MapStyleOptions
-import kotlinx.coroutines.CoroutineScope
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MapsViewModel : ViewModel() {
     var state by mutableStateOf(MapState())
 
-    var bookedSlots = mutableMapOf<Int,Int>()
 
     fun onEvent(event: MapEvent) {
-        when(event){
+        when (event) {
             is MapEvent.ToggleFalloutMap -> {
                 state = state.copy(
                     properties = state.properties.copy(
@@ -25,13 +30,32 @@ class MapsViewModel : ViewModel() {
         }
     }
 
-    fun bookSlot(slotNumber: Int, duration: Int) {
-        bookedSlots[slotNumber] = duration
+    private val database = Firebase.database.reference.child("booking")
+
+    fun bookSlot(slotNumber:Int, duration: Long) {
+        database.child(slotNumber.toString()).setValue(duration)
+
+        viewModelScope.launch {
+            delay(duration)
+            unbookSlot(slotNumber)
+        }
+    }
+
+    fun isSlotBooked(slotNumber: Int, callback: (Boolean) -> Unit) {
+        // Query Firebase to check if the slot is booked
+        database.child(slotNumber.toString()).get().addOnSuccessListener { dataSnapshot ->
+            // Check if the dataSnapshot exists
+            val isBooked = dataSnapshot.exists()
+            callback(isBooked)
+        }.addOnFailureListener { exception ->
+            Log.e(TAG, "Error checking if slot is booked: $exception")
+            callback(false)
+        }
     }
 
     fun unbookSlot(slotNumber: Int) {
-        bookedSlots.remove(slotNumber)
+        // Remove booking data from Firebase
+        database.child(slotNumber.toString()).removeValue()
     }
-
 }
 

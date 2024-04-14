@@ -56,7 +56,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.rajrishavsps.R
 import com.rajrishavsps.presentation.MapsViewModel
@@ -139,7 +138,7 @@ fun BookingScreen(
                                         snackbarHostState.showSnackbar("Please enter your name")
                                     }
                                 } else {
-                                    viewModel.bookSlot(slot, (sliderPosition * 1000).toInt())
+                                    viewModel.bookSlot(slot, (sliderPosition * 1000).toLong())
                                     showDialog = !showDialog
                                 }
                             },

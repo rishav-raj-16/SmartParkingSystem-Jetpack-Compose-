@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "326933828790",
+    "project_id": "smart-parking-system-3d4ac",
+    "storage_bucket": "smart-parking-system-3d4ac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326933828790:android:60725c9b92e12f74b90217",
+        "android_client_info": {
+          "package_name": "com.rajrishavsps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBazsSBIdfqudDes7Kr-EahBp7c8bWyabs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

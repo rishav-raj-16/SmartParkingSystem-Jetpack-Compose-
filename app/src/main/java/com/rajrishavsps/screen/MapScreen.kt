@@ -42,6 +42,7 @@ fun MapScreen(
     latlang: LatLng,
     uiSettings: MapUiSettings,
     navController: NavController,
+    onMarkerClicked: () -> Boolean
 ) {
 
     val latlangList = remember {
@@ -52,68 +53,53 @@ fun MapScreen(
         position = CameraPosition.fromLatLngZoom(latlang, 15f)
     }
 
-    var showSlots by remember {
-        mutableStateOf(false)
-    }
-
-    fun onMarkerClicked(marker: Marker): Boolean {
-        showSlots = true
-        return true
-    }
-
-
-    if (!showSlots) {
-
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    title = { Text(text = "Smart Parking System") },
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                title = { Text(text = "Smart Parking System") },
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    viewModel.onEvent(MapEvent.ToggleFalloutMap)
+                }) {
+                Icon(
+                    imageVector = if (viewModel.state.isFalloutMap) Icons.Default.WbSunny else Icons.Default.NightsStay,
+                    contentDescription = null
                 )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.onEvent(MapEvent.ToggleFalloutMap)
-                    }) {
-                    Icon(
-                        imageVector = if (viewModel.state.isFalloutMap) Icons.Default.WbSunny else Icons.Default.NightsStay,
-                        contentDescription = null
+            }
+        }
+    ) { padding ->
+        Surface(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+            color = MaterialTheme.colorScheme.primary
+        ) {
+            GoogleMap(
+                properties = viewModel.state.properties,
+                uiSettings = uiSettings,
+                cameraPositionState = cameraPositionState,
+                modifier = Modifier.fillMaxSize(),
+
+                ) {
+                latlangList.forEach {
+                    Marker(
+                        state = MarkerState(position = it),
+                        title = "Location",
+                        onClick = {
+                            onMarkerClicked()
+                        }
                     )
                 }
             }
-        ) { padding ->
-            Surface(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize(),
-                color = MaterialTheme.colorScheme.primary
-            ) {
-                GoogleMap(
-                    properties = viewModel.state.properties,
-                    uiSettings = uiSettings,
-                    cameraPositionState = cameraPositionState,
-                    modifier = Modifier.fillMaxSize(),
 
-                    ) {
-                    latlangList.forEach {
-                        Marker(
-                            state = MarkerState(position = it),
-                            title = "Location",
-                            onClick = { marker ->
-                                onMarkerClicked(marker)
-                            }
-                        )
-                    }
-                }
-
-            }
         }
-    } else {
-        navController.navigate(NavScreen.SlotsScreen.rout)
     }
 
 }

@@ -46,10 +46,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.rajrishavsps.presentation.MapsViewModel
 import com.rajrishavsps.presentation.NavScreen
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +81,6 @@ fun SlotsScreen(navController: NavController, viewModel: MapsViewModel) {
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
                         navController.popBackStack()
                     }) {
                         Icon(
@@ -163,29 +169,23 @@ fun SlotsList(navController: NavController, viewModel: MapsViewModel) {
 
 @Composable
 fun SingleSlot(
-    modifier: Modifier = Modifier,
-    slotNumber: Int = 0,
-    navController: NavController,
-    viewModel: MapsViewModel
+modifier: Modifier = Modifier,
+slotNumber: Int = 0,
+navController: NavController,
+viewModel: MapsViewModel
 ) {
+    var isBooked by remember { mutableStateOf(false) }
 
-    var isBooked by remember { mutableStateOf(viewModel.bookedSlots.containsKey(slotNumber)) }
-
-    val duration = remember { viewModel.bookedSlots[slotNumber] ?: 0 }
-
-    val coroutineScope = rememberCoroutineScope()
-
-// Coroutine to revert the booked state after a certain duration
-    LaunchedEffect(isBooked) {
-        if (isBooked) {
-            delay(duration.toLong()) // Change this to the desired duration
-            isBooked = false
-            viewModel.unbookSlot(slotNumber)
+    LaunchedEffect(slotNumber) {
+        val job = viewModel.viewModelScope.launch {
+            while (true) {
+                viewModel.isSlotBooked(slotNumber) { newIsBooked ->
+                    isBooked = newIsBooked
+                }
+                delay(1000) // Adjust delay as needed
+            }
         }
     }
-
-
-
 
     Box(
         modifier = modifier
