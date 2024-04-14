@@ -32,8 +32,9 @@ class MapsViewModel : ViewModel() {
 
     private val database = Firebase.database.reference.child("booking")
 
-    fun bookSlot(slotNumber:Int, duration: Long) {
-        database.child(slotNumber.toString()).setValue(duration)
+    fun bookSlot(slotNumber: Int, name: String, duration: Long) {
+        database.child(slotNumber.toString()).child("Duration").setValue(duration)
+        database.child(slotNumber.toString()).child("Name").setValue(name)
 
         viewModelScope.launch {
             delay(duration)
@@ -54,7 +55,6 @@ class MapsViewModel : ViewModel() {
     }
 
     fun unbookSlot(slotNumber: Int) {
-        // Remove booking data from Firebase
         database.child(slotNumber.toString()).removeValue()
     }
 }

@@ -138,7 +138,7 @@ fun BookingScreen(
                                         snackbarHostState.showSnackbar("Please enter your name")
                                     }
                                 } else {
-                                    viewModel.bookSlot(slot, (sliderPosition * 1000).toLong())
+                                    viewModel.bookSlot(slot, name, (sliderPosition * 1000).toLong())
                                     showDialog = !showDialog
                                 }
                             },
